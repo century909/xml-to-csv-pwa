@@ -49,7 +49,7 @@ function App() {
         fecha: gDatGralOpe?.dFeEmiDE.split('T')[0],
         iva10: parseFloat(gTotSub?.dIVA10 || '0').toFixed(2),
         iva5: parseFloat(gTotSub?.dIVA5 || '0').toFixed(2),
-        totalPagar: parseFloat(gTotSub?.dTotOpe).toFixed(2),
+        totalPagar: (parseFloat(gTotSub?.dIVA10 || '0') + parseFloat(gTotSub?.dIVA5 || '0')).toFixed(2),
         ruc: gDatGralOpe?.gEmis?.dRucEm,
         nombre: gDatGralOpe?.gEmis?.dNomEmi,
         timbrado: gTimb?.dNumTim,
@@ -190,7 +190,7 @@ function App() {
     if (invoices.length === 0) { alert('No hay datos para exportar.'); return; }
     const csv = Papa.unparse(invoices.map(item => ({
       'Fecha': item.fecha, 'Nº de Boleta': item.numeroFactura, 'Ruc': item.ruc,
-      'Nombre': item.nombre, 'Monto': item.totalPagar, 'Iva 10 %': item.iva10,
+      'Nombre': item.nombre, 'Monto': (parseFloat(item.iva10) + parseFloat(item.iva5)).toFixed(2), 'Iva 10 %': item.iva10,
       'Iva 5%': item.iva5, 'Total': item.totalPagar, 'Timbrado': item.timbrado,
     })));
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
