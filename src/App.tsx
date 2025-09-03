@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { XMLParser } from 'fast-xml-parser';
 import Papa from 'papaparse';
 import { useGoogleLogin } from '@react-oauth/google';
@@ -23,6 +23,9 @@ function App() {
   const [isLoading, setIsLoading] = useState(false);
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
   const [isError, setIsError] = useState(false);
+  const [selectedMonth, setSelectedMonth] = useState<string>(new Date().toISOString().slice(0, 7));
+  const [accessToken, setAccessToken] = useState<string | null>(null);
+  const [companyName, setCompanyName] = useState<string>("");
 
   // --- Lógica de Parseo (reutilizable) ---
   const processXmlString = (xmlString: string, fileName: string): InvoiceData | null => {
@@ -60,7 +63,8 @@ function App() {
   // --- Lógica de Gmail ---
   const login = useGoogleLogin({
     onSuccess: async (tokenResponse) => {
-      await fetchGmailAttachments(tokenResponse.access_token);
+      setAccessToken(tokenResponse.access_token);
+      await fetchGmailAttachments(tokenResponse.access_token, selectedMonth, companyName);
     },
     onError: () => {
       setStatusMessage('Error en el inicio de sesión con Google.');
@@ -69,7 +73,13 @@ function App() {
     scope: 'https://www.googleapis.com/auth/gmail.readonly',
   });
 
-  const fetchGmailAttachments = async (accessToken: string) => {
+  useEffect(() => {
+    if (accessToken) {
+      fetchGmailAttachments(accessToken, selectedMonth, companyName);
+    }
+  }, [selectedMonth, accessToken, companyName]);
+
+  const fetchGmailAttachments = async (token: string, month: string, company: string) => {
     setStatusMessage('Autenticado. Buscando facturas en Gmail...');
     setIsError(false);
     setIsLoading(true);
@@ -77,14 +87,24 @@ function App() {
 
     try {
       // 1. Buscar IDs de correos con facturas XML
-      const listResponse = await fetch('https://www.googleapis.com/gmail/v1/users/me/messages?q=has:attachment filename:xml', {
-        headers: { Authorization: `Bearer ${accessToken}` },
+      const [year, monthNumber] = month.split('-');
+      const startDate = `${year}-${monthNumber}-01`;
+      const endDate = new Date(parseInt(year), parseInt(monthNumber), 0);
+      const formattedEndDate = `${year}-${monthNumber}-${endDate.getDate()}`;
+      
+      let query = `has:attachment filename:xml after:${startDate} before:${formattedEndDate}`;
+      if (company) {
+        query += ` from:${company}`;
+      }
+
+      const listResponse = await fetch(`https://www.googleapis.com/gmail/v1/users/me/messages?q=${encodeURIComponent(query)}`, {
+        headers: { Authorization: `Bearer ${token}` },
       });
       if (!listResponse.ok) throw new Error('No se pudo listar los correos de Gmail.');
       const listData = await listResponse.json();
 
       if (!listData.messages || listData.resultSizeEstimate === 0) {
-        setStatusMessage('No se encontraron correos con archivos adjuntos XML.');
+        setStatusMessage('No se encontraron correos con archivos adjuntos XML para el mes seleccionado.');
         setIsLoading(false);
         return;
       }
@@ -93,9 +113,9 @@ function App() {
 
       // 2. Procesar cada correo para obtener los adjuntos
       const allInvoiceData: InvoiceData[] = [];
-      for (const message of listData.messages.slice(0, 15)) { // Limitar a los primeros 15 correos para no exceder límites
+      for (const message of listData.messages.slice(0, 50)) { // Limitar a los primeros 50 correos para no exceder límites
         const msgResponse = await fetch(`https://www.googleapis.com/gmail/v1/users/me/messages/${message.id}`,
-          { headers: { Authorization: `Bearer ${accessToken}` } }
+          { headers: { Authorization: `Bearer ${token}` } }
         );
         if (!msgResponse.ok) continue;
         const msgData = await msgResponse.json();
@@ -104,7 +124,7 @@ function App() {
         for (const part of parts) {
           if (part.filename && part.filename.toLowerCase().endsWith('.xml') && part.body.attachmentId) {
             const attachResponse = await fetch(`https://www.googleapis.com/gmail/v1/users/me/messages/${message.id}/attachments/${part.body.attachmentId}`,
-              { headers: { Authorization: `Bearer ${accessToken}` } }
+              { headers: { Authorization: `Bearer ${token}` } }
             );
             if (!attachResponse.ok) continue;
             const attachData = await attachResponse.json();
@@ -194,6 +214,8 @@ function App() {
           <label htmlFor="file-upload" className="button button-upload">Seleccionar Archivos Locales</label>
           <input id="file-upload" type="file" accept=".xml,text/xml" multiple onChange={handleFileChange} />
           <button onClick={() => login()} className="button button-gmail">Buscar en Gmail</button>
+          <input type="month" value={selectedMonth} onChange={(e) => setSelectedMonth(e.target.value)} className="month-selector" />
+          <input type="text" value={companyName} onChange={(e) => setCompanyName(e.target.value)} placeholder="Filtrar por empresa" className="company-selector" />
           <button onClick={downloadCSV} disabled={invoices.length === 0} className="button button-download">Descargar CSV</button>
         </div>
 

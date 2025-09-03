@@ -179,3 +179,24 @@ tbody tr:last-child td {
 .text-right {
   text-align: right;
 }
+
+.month-selector {
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  font-size: 1rem;
+  font-weight: 600;
+  background-color: var(--card-background);
+  color: var(--text-color);
+  cursor: pointer;
+}
+
+.company-selector {
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  font-size: 1rem;
+  font-weight: 600;
+  background-color: var(--card-background);
+  color: var(--text-color);
+}
