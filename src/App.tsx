@@ -9,13 +9,15 @@ interface InvoiceData {
   id: string;
   numeroFactura: string;
   fecha: string;
+  monto: string;
   iva10: string;
   iva5: string;
-  totalPagar: string;
+  ivaTotal: string;
   ruc: string;
   nombre: string;
   timbrado: string;
 }
+
 
 // --- Componente Principal ---
 function App() {
@@ -47,9 +49,10 @@ function App() {
         id: fileName + '-' + Math.random(),
         numeroFactura: `${gTimb?.dEst}-${gTimb?.dPunExp}-${gTimb?.dNumDoc}`,
         fecha: gDatGralOpe?.dFeEmiDE.split('T')[0],
+        monto: parseFloat(gTotSub?.dTotGralOpe || '0').toFixed(2),
         iva10: parseFloat(gTotSub?.dIVA10 || '0').toFixed(2),
         iva5: parseFloat(gTotSub?.dIVA5 || '0').toFixed(2),
-        totalPagar: (parseFloat(gTotSub?.dIVA10 || '0') + parseFloat(gTotSub?.dIVA5 || '0')).toFixed(2),
+        ivaTotal: (parseFloat(gTotSub?.dIVA10 || '0') + parseFloat(gTotSub?.dIVA5 || '0')).toFixed(2),
         ruc: gDatGralOpe?.gEmis?.dRucEm,
         nombre: gDatGralOpe?.gEmis?.dNomEmi,
         timbrado: gTimb?.dNumTim,
@@ -190,8 +193,8 @@ function App() {
     if (invoices.length === 0) { alert('No hay datos para exportar.'); return; }
     const csv = Papa.unparse(invoices.map(item => ({
       'Fecha': item.fecha, 'Nº de Boleta': item.numeroFactura, 'Ruc': item.ruc,
-      'Nombre': item.nombre, 'Monto': (parseFloat(item.iva10) + parseFloat(item.iva5)).toFixed(2), 'Iva 10 %': item.iva10,
-      'Iva 5%': item.iva5, 'Total': item.totalPagar, 'Timbrado': item.timbrado,
+      'Nombre': item.nombre, 'Monto': item.monto, 'Iva 10 %': item.iva10,
+      'Iva 5%': item.iva5, 'Total Iva': item.ivaTotal, 'Timbrado': item.timbrado,
     })));
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement('a');
@@ -201,7 +204,7 @@ function App() {
     link.click();
     document.body.removeChild(link);
   };
-
+  
   // --- Renderizado ---
   return (
     <div className="App">
@@ -227,16 +230,16 @@ function App() {
             <table>
               <thead>
                 <tr>
-                  <th>Factura</th><th>Fecha</th><th>RUC</th><th>Nombre</th>
-                  <th>IVA 10%</th><th>IVA 5%</th><th>Total</th><th>Timbrado</th>
+                  <th>Factura</th><th>Fecha</th><th>RUC</th><th>Nombre</th><th>Monto</th>
+                  <th>IVA 10%</th><th>IVA 5%</th><th>Total Iva</th><th>Timbrado</th>
                 </tr>
               </thead>
               <tbody>
                 {invoices.map(invoice => (
                   <tr key={invoice.id}>
                     <td>{invoice.numeroFactura}</td><td>{invoice.fecha}</td><td>{invoice.ruc}</td>
-                    <td>{invoice.nombre}</td><td className="text-right">{invoice.iva10}</td>
-                    <td className="text-right">{invoice.iva5}</td><td className="text-right">{invoice.totalPagar}</td>
+                    <td>{invoice.nombre}</td><td>{invoice.monto}</td><td className="text-right">{invoice.iva10}</td>
+                    <td className="text-right">{invoice.iva5}</td><td className="text-right">{invoice.ivaTotal}</td>
                     <td>{invoice.timbrado}</td>
                   </tr>
                 ))}
