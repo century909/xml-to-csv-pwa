@@ -6,14 +6,14 @@ import './App.css';
 
 // Simple SVG Icons
 const FileIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+  <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/>
     <polyline points="14 2 14 8 20 8"/>
   </svg>
 );
 
 const DownloadIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+  <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
     <polyline points="7 10 12 15 17 10"/>
     <line x1="12" y1="15" x2="12" y2="3"/>
@@ -21,7 +21,7 @@ const DownloadIcon = () => (
 );
 
 const GmailIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+  <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
     <polyline points="22,6 12,13 2,6"/>
   </svg>
@@ -264,46 +264,49 @@ function App() {
       </header>
       <main>
         <div className="actions">
-          <label htmlFor="file-upload" className="button button-upload">
-            <FileIcon />
-            Seleccionar Archivos Locales
-          </label>
-          <input id="file-upload" type="file" accept=".xml,text/xml" multiple onChange={handleFileChange} />
-          
-          <button onClick={() => login()} className="button button-gmail">
-            <GmailIcon />
-            Buscar en Gmail
-          </button>
-          
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            <CalendarIcon />
-            <input 
-              type="month" 
-              value={selectedMonth} 
-              onChange={(e) => setSelectedMonth(e.target.value)} 
-              className="month-selector" 
-            />
+          <div className="actions-grid">
+            <label htmlFor="file-upload" className="button-grid button-upload">
+              <FileIcon />
+              <span>Cargar Archivos</span>
+            </label>
+            <input id="file-upload" type="file" accept=".xml,text/xml" multiple onChange={handleFileChange} />
+
+            <button onClick={() => login()} className="button-grid button-gmail">
+              <GmailIcon />
+              <span>Buscar en Gmail</span>
+            </button>
+
+            <button 
+              onClick={downloadCSV} 
+              disabled={invoices.length === 0} 
+              className="button-grid button-download"
+            >
+              <DownloadIcon />
+              <span>Descargar CSV</span>
+            </button>
           </div>
-          
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            <CompanyIcon />
-            <input 
-              type="text" 
-              value={companyName} 
-              onChange={(e) => setCompanyName(e.target.value)} 
-              placeholder="Filtrar por empresa" 
-              className="company-selector" 
-            />
+
+          <div className="filters">
+            <div className="filter-item">
+              <CalendarIcon />
+              <input 
+                type="month" 
+                value={selectedMonth} 
+                onChange={(e) => setSelectedMonth(e.target.value)} 
+                className="month-selector" 
+              />
+            </div>
+            <div className="filter-item">
+              <CompanyIcon />
+              <input 
+                type="text" 
+                value={companyName} 
+                onChange={(e) => setCompanyName(e.target.value)} 
+                placeholder="Filtrar por empresa" 
+                className="company-selector" 
+              />
+            </div>
           </div>
-          
-          <button 
-            onClick={downloadCSV} 
-            disabled={invoices.length === 0} 
-            className="button button-download"
-          >
-            <DownloadIcon />
-            Descargar CSV
-          </button>
         </div>
 
         {isLoading && <LoadingSpinner />}
