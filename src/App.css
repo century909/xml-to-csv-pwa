@@ -145,6 +145,22 @@ input[type="file"] {
   background: linear-gradient(135deg, var(--primary-hover) 0%, #3730A3 100%);
 }
 
+/* Ajustes específicos para el botón de selección de archivos en móviles */
+@media (max-width: 768px) {
+  .button-upload {
+    padding: 8px 10px;
+    font-size: 0.85rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .button-upload {
+    padding: 6px 8px;
+    font-size: 0.8rem;
+    gap: 3px;
+  }
+}
+
 /* Download Button */
 .button-download {
   background: linear-gradient(135deg, var(--secondary-color) 0%, var(--secondary-hover) 100%);
@@ -319,6 +335,8 @@ tbody tr:hover {
     font-size: 0.9rem;
     min-height: 36px;
     min-width: auto; /* Eliminar ancho mínimo en móviles */
+    white-space: normal; /* Permitir que el texto se divida en varias líneas */
+    text-align: center; /* Centrar el texto */
   }
   
   .month-selector, .company-selector {
@@ -356,6 +374,8 @@ tbody tr:hover {
     min-height: 32px;
     gap: 4px;
     min-width: auto; /* Asegurar que no haya ancho mínimo */
+    white-space: normal; /* Permitir que el texto se divida en varias líneas */
+    text-align: center; /* Centrar el texto */
   }
   
   .month-selector, .company-selector {
