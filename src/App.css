@@ -115,6 +115,8 @@ input[type="file"] {
   gap: 6px;
   box-shadow: var(--shadow-sm);
   min-height: 40px;
+  min-width: 120px; /* Ancho mínimo para botones en pantallas grandes */
+  white-space: nowrap; /* Evitar que el texto se divida en varias líneas */
 }
 
 .button:disabled {
@@ -316,6 +318,7 @@ tbody tr:hover {
     padding: 8px 12px;
     font-size: 0.9rem;
     min-height: 36px;
+    min-width: auto; /* Eliminar ancho mínimo en móviles */
   }
   
   .month-selector, .company-selector {
@@ -352,6 +355,7 @@ tbody tr:hover {
     font-size: 0.85rem;
     min-height: 32px;
     gap: 4px;
+    min-width: auto; /* Asegurar que no haya ancho mínimo */
   }
   
   .month-selector, .company-selector {
