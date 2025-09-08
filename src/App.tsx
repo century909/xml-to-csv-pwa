@@ -4,6 +4,48 @@ import Papa from 'papaparse';
 import { useGoogleLogin } from '@react-oauth/google';
 import './App.css';
 
+// Simple SVG Icons
+const FileIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/>
+    <polyline points="14 2 14 8 20 8"/>
+  </svg>
+);
+
+const DownloadIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+    <polyline points="7 10 12 15 17 10"/>
+    <line x1="12" y1="15" x2="12" y2="3"/>
+  </svg>
+);
+
+const GmailIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+    <polyline points="22,6 12,13 2,6"/>
+  </svg>
+);
+
+const CalendarIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+    <line x1="16" y1="2" x2="16" y2="6"/>
+    <line x1="8" y1="2" x2="8" y2="6"/>
+    <line x1="3" y1="10" x2="21" y2="10"/>
+  </svg>
+);
+
+const CompanyIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+    <polyline points="14 2 14 8 20 8"/>
+    <line x1="16" y1="13" x2="8" y2="13"/>
+    <line x1="16" y1="17" x2="8" y2="17"/>
+    <polyline points="10 9 9 9 8 9"/>
+  </svg>
+);
+
 // Interfaces
 interface InvoiceData {
   id: string;
@@ -205,6 +247,14 @@ function App() {
     document.body.removeChild(link);
   };
   
+  // Custom loading component
+  const LoadingSpinner = () => (
+    <div className="spinner-container">
+      <div className="spinner"></div>
+      <p>Procesando facturas...</p>
+    </div>
+  );
+
   // --- Renderizado ---
   return (
     <div className="App">
@@ -214,32 +264,94 @@ function App() {
       </header>
       <main>
         <div className="actions">
-          <label htmlFor="file-upload" className="button button-upload">Seleccionar Archivos Locales</label>
+          <label htmlFor="file-upload" className="button button-upload">
+            <FileIcon />
+            Seleccionar Archivos Locales
+          </label>
           <input id="file-upload" type="file" accept=".xml,text/xml" multiple onChange={handleFileChange} />
-          <button onClick={() => login()} className="button button-gmail">Buscar en Gmail</button>
-          <input type="month" value={selectedMonth} onChange={(e) => setSelectedMonth(e.target.value)} className="month-selector" />
-          <input type="text" value={companyName} onChange={(e) => setCompanyName(e.target.value)} placeholder="Filtrar por empresa" className="company-selector" />
-          <button onClick={downloadCSV} disabled={invoices.length === 0} className="button button-download">Descargar CSV</button>
+          
+          <button onClick={() => login()} className="button button-gmail">
+            <GmailIcon />
+            Buscar en Gmail
+          </button>
+          
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <CalendarIcon />
+            <input 
+              type="month" 
+              value={selectedMonth} 
+              onChange={(e) => setSelectedMonth(e.target.value)} 
+              className="month-selector" 
+            />
+          </div>
+          
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <CompanyIcon />
+            <input 
+              type="text" 
+              value={companyName} 
+              onChange={(e) => setCompanyName(e.target.value)} 
+              placeholder="Filtrar por empresa" 
+              className="company-selector" 
+            />
+          </div>
+          
+          <button 
+            onClick={downloadCSV} 
+            disabled={invoices.length === 0} 
+            className="button button-download"
+          >
+            <DownloadIcon />
+            Descargar CSV
+          </button>
         </div>
 
-        {isLoading && <div className="spinner"></div>}
-        {statusMessage && <p className={isError ? 'error-message' : 'status-message'}>{statusMessage}</p>}
+        {isLoading && <LoadingSpinner />}
+        {statusMessage && (
+          <div className={isError ? 'error-message' : 'status-message'}>
+            {isError ? (
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="12" cy="12" r="10"/>
+                <line x1="12" y1="8" x2="12" y2="12"/>
+                <line x1="12" y1="16" x2="12.01" y2="16"/>
+              </svg>
+            ) : (
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                <polyline points="22 4 12 14.01 9 11.01"/>
+              </svg>
+            )}
+            <span>{statusMessage}</span>
+          </div>
+        )}
 
         {invoices.length > 0 && (
           <div className="table-container">
             <table>
               <thead>
                 <tr>
-                  <th>Factura</th><th>Fecha</th><th>RUC</th><th>Nombre</th><th>Monto</th>
-                  <th>IVA 10%</th><th>IVA 5%</th><th>Total Iva</th><th>Timbrado</th>
+                  <th>Factura</th>
+                  <th>Fecha</th>
+                  <th>RUC</th>
+                  <th>Nombre</th>
+                  <th className="text-right">Monto</th>
+                  <th className="text-right">IVA 10%</th>
+                  <th className="text-right">IVA 5%</th>
+                  <th className="text-right">Total Iva</th>
+                  <th>Timbrado</th>
                 </tr>
               </thead>
               <tbody>
                 {invoices.map(invoice => (
                   <tr key={invoice.id}>
-                    <td>{invoice.numeroFactura}</td><td>{invoice.fecha}</td><td>{invoice.ruc}</td>
-                    <td>{invoice.nombre}</td><td>{invoice.monto}</td><td className="text-right">{invoice.iva10}</td>
-                    <td className="text-right">{invoice.iva5}</td><td className="text-right">{invoice.ivaTotal}</td>
+                    <td>{invoice.numeroFactura}</td>
+                    <td>{invoice.fecha}</td>
+                    <td>{invoice.ruc}</td>
+                    <td>{invoice.nombre}</td>
+                    <td className="text-right">{invoice.monto}</td>
+                    <td className="text-right">{invoice.iva10}</td>
+                    <td className="text-right">{invoice.iva5}</td>
+                    <td className="text-right">{invoice.ivaTotal}</td>
                     <td>{invoice.timbrado}</td>
                   </tr>
                 ))}
