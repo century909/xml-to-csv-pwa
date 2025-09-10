@@ -71,7 +71,10 @@ function App() {
   const [selectedMonth, setSelectedMonth] = useState<string>(new Date().toISOString().slice(0, 7));
   const [accessToken, setAccessToken] = useState<string | null>(null);
   const [companyName, setCompanyName] = useState<string>("");
-  const [theme, setTheme] = useState<string>(document.documentElement.getAttribute('data-theme') || 'light');
+  const [theme, setTheme] = useState<string>(() => {
+    const saved = document.documentElement.getAttribute('data-theme');
+    return saved || 'light';
+  });
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
