@@ -3,6 +3,7 @@ import { XMLParser } from 'fast-xml-parser';
 import Papa from 'papaparse';
 import { useGoogleLogin } from '@react-oauth/google';
 import './App.css';
+import Logo from './assets/logo.svg';
 
 // Simple SVG Icons
 const FileIcon = () => (
@@ -70,6 +71,14 @@ function App() {
   const [selectedMonth, setSelectedMonth] = useState<string>(new Date().toISOString().slice(0, 7));
   const [accessToken, setAccessToken] = useState<string | null>(null);
   const [companyName, setCompanyName] = useState<string>("");
+  const [theme, setTheme] = useState<string>(document.documentElement.getAttribute('data-theme') || 'light');
+
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme);
+    try { localStorage.setItem('theme', theme); } catch {}
+  }, [theme]);
+
+  const toggleTheme = () => setTheme(prev => prev === 'dark' ? 'light' : 'dark');
 
   // --- Lógica de Parseo (reutilizable) ---
   const processXmlString = (xmlString: string, fileName: string): InvoiceData | null => {
@@ -246,6 +255,12 @@ function App() {
     link.click();
     document.body.removeChild(link);
   };
+
+  const formatNumber = (value: string | number) => {
+    const num = typeof value === 'string' ? parseFloat(value) : value;
+    if (isNaN(num)) return value as any;
+    return new Intl.NumberFormat('es-PY', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(num);
+  };
   
   // Custom loading component
   const LoadingSpinner = () => (
@@ -259,8 +274,19 @@ function App() {
   return (
     <div className="App">
       <header className="App-header">
-        <h1>Visor y Exportador de Facturas XML</h1>
-        <p>Cargue sus archivos de factura electrónica (.xml) o búsquelos en su Gmail.</p>
+        <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',gap:'1rem',maxWidth:800,margin:'0 auto'}}>
+          <div style={{display:'flex',alignItems:'center',gap:'12px',textAlign:'left'}}>
+            <img src={Logo} alt="Facturas" width={40} height={40} />
+            <div>
+              <h1>Visor y Exportador de Facturas XML</h1>
+              <p>Cargue sus archivos de factura electrónica (.xml) o búsquelos en su Gmail.</p>
+            </div>
+          </div>
+          <button aria-label="Cambiar tema" className="theme-toggle" onClick={toggleTheme}>
+            <span>{theme === 'dark' ? 'Modo oscuro' : 'Modo claro'}</span>
+            <div className="dot" />
+          </button>
+        </div>
       </header>
       <main>
         <div className="actions">
@@ -328,7 +354,7 @@ function App() {
           </div>
         )}
 
-        {invoices.length > 0 && (
+        {invoices.length > 0 ? (
           <div className="table-container">
             <table>
               <thead>
@@ -351,16 +377,23 @@ function App() {
                     <td>{invoice.fecha}</td>
                     <td>{invoice.ruc}</td>
                     <td>{invoice.nombre}</td>
-                    <td className="text-right">{invoice.monto}</td>
-                    <td className="text-right">{invoice.iva10}</td>
-                    <td className="text-right">{invoice.iva5}</td>
-                    <td className="text-right">{invoice.ivaTotal}</td>
+                    <td className="text-right">{formatNumber(invoice.monto)}</td>
+                    <td className="text-right">{formatNumber(invoice.iva10)}</td>
+                    <td className="text-right">{formatNumber(invoice.iva5)}</td>
+                    <td className="text-right">{formatNumber(invoice.ivaTotal)}</td>
                     <td>{invoice.timbrado}</td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
+        ) : (
+          !isLoading && (
+            <div style={{maxWidth:800,margin:'2rem auto 3rem',padding:'2rem',border:'1px dashed var(--border-color)',borderRadius:16,background:'var(--card-background)',boxShadow:'var(--shadow-sm)'}}>
+              <h3 style={{marginTop:0}}>Comienza cargando tus facturas</h3>
+              <p style={{color:'var(--text-light)'}}>Puedes arrastrar y soltar archivos .xml, usar el botón "Cargar Archivos" o conectar tu cuenta de Gmail para buscarlas automáticamente por mes y empresa.</p>
+            </div>
+          )
         )}
       </main>
     </div>

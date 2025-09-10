@@ -6,8 +6,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Facturas PWA</title>
     <link rel="manifest" href="/manifest.json" />
-    <meta name="theme-color" content="#4F46E5">
+    <meta name="theme-color" content="#7C3AED">
     <meta name="description" content="Aplicación para procesar facturas electrónicas XML y exportarlas a CSV">
+    <script>
+      (function() {
+        try {
+          var saved = localStorage.getItem('theme');
+          var systemPrefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+          var theme = saved || (systemPrefersDark ? 'dark' : 'light');
+          document.documentElement.setAttribute('data-theme', theme);
+        } catch (e) {}
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>

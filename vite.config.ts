@@ -13,18 +13,10 @@ export default defineConfig({
         name: 'Lector de Facturas PWA',
         short_name: 'Facturas',
         description: 'Una aplicación para leer y exportar facturas electrónicas XML.',
-        theme_color: '#4F46E5',
+        theme_color: '#7C3AED',
         icons: [
-          {
-            src: 'pwa-192x192.png',
-            sizes: '192x192',
-            type: 'image/png'
-          },
-          {
-            src: 'pwa-512x512.png',
-            sizes: '512x512',
-            type: 'image/png'
-          }
+          { src: 'pwa-icon.svg', sizes: 'any', type: 'image/svg+xml', purpose: 'any' },
+          { src: 'pwa-icon.svg', sizes: 'any', type: 'image/svg+xml', purpose: 'maskable' }
         ]
       }
     })
