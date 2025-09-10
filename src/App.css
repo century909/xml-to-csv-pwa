@@ -1,8 +1,8 @@
 :root {
-  --primary-color: #7C3AED; /* Violet 600 */
-  --primary-hover: #6D28D9; /* Violet 700 */
-  --secondary-color: #A855F7; /* Purple/Violet 500 */
-  --secondary-hover: #9333EA; /* Purple/Violet 600 */
+  --primary-color: #2563EB; /* Blue 600 */
+  --primary-hover: #1D4ED8; /* Blue 700 */
+  --secondary-color: #3B82F6; /* Blue 500 */
+  --secondary-hover: #2563EB; /* Blue 600 */
   --gmail-color: #DB4437; /* Google Red */
   --gmail-hover: #C33D2E; /* Darker Google Red */
   --background-color: #F3F4F6; /* Gray 100 */
