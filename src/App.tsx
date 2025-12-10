@@ -279,8 +279,7 @@ function App() {
       delimiter: ",",
       header: true,
       newline: "\r\n",
-      skipEmptyLines: false,
-      columns: null
+      skipEmptyLines: false
     });
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement('a');
