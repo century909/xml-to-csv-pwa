@@ -245,7 +245,8 @@ function App() {
   // --- Lógica de Exportación ---
   const downloadCSV = () => {
     if (invoices.length === 0) { alert('No hay datos para exportar.'); return; }
-    const csv = Papa.unparse(invoices.map(item => ({
+
+    const dataToExport = invoices.map(item => ({
       'Fecha': item.fecha, 'Nº de Boleta': item.numeroFactura, 'Ruc': item.ruc,
       'Nombre': item.nombre,
       'Monto': item.monto.replace('.', ','),
@@ -253,7 +254,34 @@ function App() {
       'Iva 5%': item.iva5.replace('.', ','),
       'Total Iva': item.ivaTotal.replace('.', ','),
       'Timbrado': item.timbrado,
-    })));
+    }));
+
+    // Agregar fila de totales con fórmulas de Google Sheets
+    // Asumiendo que las columnas son:
+    // A: Fecha, B: Nº de Boleta, C: Ruc, D: Nombre, E: Monto, F: Iva 10%, G: Iva 5%, H: Total Iva, I: Timbrado
+    // La fila de datos comienza en la fila 2.
+    const lastRowIndex = invoices.length + 1;
+
+    dataToExport.push({
+      'Fecha': '', 'Nº de Boleta': '', 'Ruc': '',
+      'Nombre': 'TOTAL',
+      'Monto': `=SUM(E2:E${lastRowIndex})`,
+      'Iva 10 %': `=SUM(F2:F${lastRowIndex})`,
+      'Iva 5%': `=SUM(G2:G${lastRowIndex})`,
+      'Total Iva': `=SUM(H2:H${lastRowIndex})`,
+      'Timbrado': '',
+    });
+
+    const csv = Papa.unparse(dataToExport, {
+      quotes: true, // Forzar comillas para evitar problemas con caracteres especiales, aunque las fórmulas podrían quedar como strings
+      quoteChar: '"',
+      escapeChar: '"',
+      delimiter: ",",
+      header: true,
+      newline: "\r\n",
+      skipEmptyLines: false,
+      columns: null
+    });
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement('a');
     link.href = URL.createObjectURL(blob);
