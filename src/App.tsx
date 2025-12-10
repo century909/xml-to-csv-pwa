@@ -8,42 +8,42 @@ import Logo from './assets/logo.svg';
 // Simple SVG Icons
 const FileIcon = () => (
   <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/>
-    <polyline points="14 2 14 8 20 8"/>
+    <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z" />
+    <polyline points="14 2 14 8 20 8" />
   </svg>
 );
 
 const DownloadIcon = () => (
   <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-    <polyline points="7 10 12 15 17 10"/>
-    <line x1="12" y1="15" x2="12" y2="3"/>
+    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+    <polyline points="7 10 12 15 17 10" />
+    <line x1="12" y1="15" x2="12" y2="3" />
   </svg>
 );
 
 const GmailIcon = () => (
   <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
-    <polyline points="22,6 12,13 2,6"/>
+    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+    <polyline points="22,6 12,13 2,6" />
   </svg>
 );
 
 const CalendarIcon = () => (
   <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
-    <line x1="16" y1="2" x2="16" y2="6"/>
-    <line x1="8" y1="2" x2="8" y2="6"/>
-    <line x1="3" y1="10" x2="21" y2="10"/>
+    <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+    <line x1="16" y1="2" x2="16" y2="6" />
+    <line x1="8" y1="2" x2="8" y2="6" />
+    <line x1="3" y1="10" x2="21" y2="10" />
   </svg>
 );
 
 const CompanyIcon = () => (
   <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-    <polyline points="14 2 14 8 20 8"/>
-    <line x1="16" y1="13" x2="8" y2="13"/>
-    <line x1="16" y1="17" x2="8" y2="17"/>
-    <polyline points="10 9 9 9 8 9"/>
+    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+    <polyline points="14 2 14 8 20 8" />
+    <line x1="16" y1="13" x2="8" y2="13" />
+    <line x1="16" y1="17" x2="8" y2="17" />
+    <polyline points="10 9 9 9 8 9" />
   </svg>
 );
 
@@ -78,7 +78,7 @@ function App() {
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
-    try { localStorage.setItem('theme', theme); } catch {}
+    try { localStorage.setItem('theme', theme); } catch { }
   }, [theme]);
 
   const toggleTheme = () => setTheme(prev => prev === 'dark' ? 'light' : 'dark');
@@ -148,7 +148,7 @@ function App() {
       const startDate = `${year}-${monthNumber}-01`;
       const endDate = new Date(parseInt(year), parseInt(monthNumber), 0);
       const formattedEndDate = `${year}-${monthNumber}-${endDate.getDate()}`;
-      
+
       let query = `has:attachment filename:xml after:${startDate} before:${formattedEndDate}`;
       if (company) {
         query += ` from:${company}`;
@@ -185,7 +185,7 @@ function App() {
             );
             if (!attachResponse.ok) continue;
             const attachData = await attachResponse.json();
-            
+
             // Decodificar Base64URL a string XML
             const xmlString = atob(attachData.data.replace(/-/g, '+').replace(/_/g, '/'));
             const invoice = processXmlString(xmlString, part.filename);
@@ -238,7 +238,7 @@ function App() {
       setStatusMessage('No se pudieron procesar los archivos o no contenían datos de factura válidos.');
       setIsError(true);
     }
-    
+
     setIsLoading(false);
   };
 
@@ -247,8 +247,12 @@ function App() {
     if (invoices.length === 0) { alert('No hay datos para exportar.'); return; }
     const csv = Papa.unparse(invoices.map(item => ({
       'Fecha': item.fecha, 'Nº de Boleta': item.numeroFactura, 'Ruc': item.ruc,
-      'Nombre': item.nombre, 'Monto': item.monto, 'Iva 10 %': item.iva10,
-      'Iva 5%': item.iva5, 'Total Iva': item.ivaTotal, 'Timbrado': item.timbrado,
+      'Nombre': item.nombre,
+      'Monto': item.monto.replace('.', ','),
+      'Iva 10 %': item.iva10.replace('.', ','),
+      'Iva 5%': item.iva5.replace('.', ','),
+      'Total Iva': item.ivaTotal.replace('.', ','),
+      'Timbrado': item.timbrado,
     })));
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement('a');
@@ -264,7 +268,7 @@ function App() {
     if (isNaN(num)) return value as any;
     return new Intl.NumberFormat('es-PY', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(num);
   };
-  
+
   // Custom loading component
   const LoadingSpinner = () => (
     <div className="spinner-container">
@@ -277,8 +281,8 @@ function App() {
   return (
     <div className="App">
       <header className="App-header">
-        <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',gap:'1rem',maxWidth:800,margin:'0 auto'}}>
-          <div style={{display:'flex',alignItems:'center',gap:'12px',textAlign:'left'}}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '1rem', maxWidth: 800, margin: '0 auto' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', textAlign: 'left' }}>
             <img src={Logo} alt="Facturas" width={40} height={40} />
             <div>
               <h1>Visor y Exportador de Facturas XML</h1>
@@ -305,9 +309,9 @@ function App() {
               <span>Buscar en Gmail</span>
             </button>
 
-            <button 
-              onClick={downloadCSV} 
-              disabled={invoices.length === 0} 
+            <button
+              onClick={downloadCSV}
+              disabled={invoices.length === 0}
               className="button-grid button-download"
             >
               <DownloadIcon />
@@ -318,21 +322,21 @@ function App() {
           <div className="filters">
             <div className="filter-item">
               <CalendarIcon />
-              <input 
-                type="month" 
-                value={selectedMonth} 
-                onChange={(e) => setSelectedMonth(e.target.value)} 
-                className="month-selector" 
+              <input
+                type="month"
+                value={selectedMonth}
+                onChange={(e) => setSelectedMonth(e.target.value)}
+                className="month-selector"
               />
             </div>
             <div className="filter-item">
               <CompanyIcon />
-              <input 
-                type="text" 
-                value={companyName} 
-                onChange={(e) => setCompanyName(e.target.value)} 
-                placeholder="Filtrar por empresa" 
-                className="company-selector" 
+              <input
+                type="text"
+                value={companyName}
+                onChange={(e) => setCompanyName(e.target.value)}
+                placeholder="Filtrar por empresa"
+                className="company-selector"
               />
             </div>
           </div>
@@ -343,14 +347,14 @@ function App() {
           <div className={isError ? 'error-message' : 'status-message'}>
             {isError ? (
               <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <circle cx="12" cy="12" r="10"/>
-                <line x1="12" y1="8" x2="12" y2="12"/>
-                <line x1="12" y1="16" x2="12.01" y2="16"/>
+                <circle cx="12" cy="12" r="10" />
+                <line x1="12" y1="8" x2="12" y2="12" />
+                <line x1="12" y1="16" x2="12.01" y2="16" />
               </svg>
             ) : (
               <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
-                <polyline points="22 4 12 14.01 9 11.01"/>
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+                <polyline points="22 4 12 14.01 9 11.01" />
               </svg>
             )}
             <span>{statusMessage}</span>
@@ -392,9 +396,9 @@ function App() {
           </div>
         ) : (
           !isLoading && (
-            <div style={{maxWidth:800,margin:'2rem auto 3rem',padding:'2rem',border:'1px dashed var(--border-color)',borderRadius:16,background:'var(--card-background)',boxShadow:'var(--shadow-sm)'}}>
-              <h3 style={{marginTop:0}}>Comienza cargando tus facturas</h3>
-              <p style={{color:'var(--text-light)'}}>Puedes arrastrar y soltar archivos .xml, usar el botón "Cargar Archivos" o conectar tu cuenta de Gmail para buscarlas automáticamente por mes y empresa.</p>
+            <div style={{ maxWidth: 800, margin: '2rem auto 3rem', padding: '2rem', border: '1px dashed var(--border-color)', borderRadius: 16, background: 'var(--card-background)', boxShadow: 'var(--shadow-sm)' }}>
+              <h3 style={{ marginTop: 0 }}>Comienza cargando tus facturas</h3>
+              <p style={{ color: 'var(--text-light)' }}>Puedes arrastrar y soltar archivos .xml, usar el botón "Cargar Archivos" o conectar tu cuenta de Gmail para buscarlas automáticamente por mes y empresa.</p>
             </div>
           )
         )}
