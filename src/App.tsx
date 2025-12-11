@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { XMLParser } from 'fast-xml-parser';
-import Papa from 'papaparse';
+import * as XLSX from 'xlsx';
 import { useGoogleLogin } from '@react-oauth/google';
 import './App.css';
 import Logo from './assets/logo.svg';
@@ -243,51 +243,43 @@ function App() {
   };
 
   // --- Lógica de Exportación ---
-  const downloadCSV = () => {
+  const downloadXLSX = () => {
     if (invoices.length === 0) { alert('No hay datos para exportar.'); return; }
 
     const dataToExport = invoices.map(item => ({
-      'Fecha': item.fecha, 'Nº de Boleta': item.numeroFactura, 'Ruc': item.ruc,
+      'Fecha': item.fecha,
+      'Nº de Boleta': item.numeroFactura,
+      'Ruc': item.ruc,
       'Nombre': item.nombre,
-      'Monto': item.monto.replace('.', ','),
-      'Iva 10 %': item.iva10.replace('.', ','),
-      'Iva 5%': item.iva5.replace('.', ','),
-      'Total Iva': item.ivaTotal.replace('.', ','),
+      'Monto': parseFloat(item.monto), // Keep as number for Excel
+      'Iva 10 %': parseFloat(item.iva10),
+      'Iva 5%': parseFloat(item.iva5),
+      'Total Iva': parseFloat(item.ivaTotal),
       'Timbrado': item.timbrado,
     }));
 
-    // Agregar fila de totales con fórmulas de Google Sheets
-    // Asumiendo que las columnas son:
-    // A: Fecha, B: Nº de Boleta, C: Ruc, D: Nombre, E: Monto, F: Iva 10%, G: Iva 5%, H: Total Iva, I: Timbrado
-    // La fila de datos comienza en la fila 2.
-    const lastRowIndex = invoices.length + 1;
+    // Agregar fila de totales
+    const totalMonto = invoices.reduce((sum, item) => sum + parseFloat(item.monto), 0);
+    const totalIva10 = invoices.reduce((sum, item) => sum + parseFloat(item.iva10), 0);
+    const totalIva5 = invoices.reduce((sum, item) => sum + parseFloat(item.iva5), 0);
+    const totalIvaTotal = invoices.reduce((sum, item) => sum + parseFloat(item.ivaTotal), 0);
 
     dataToExport.push({
-      'Fecha': '', 'Nº de Boleta': '', 'Ruc': '',
+      'Fecha': '',
+      'Nº de Boleta': '',
+      'Ruc': '',
       'Nombre': 'TOTAL',
-      'Monto': `=SUM(E2:E${lastRowIndex})`,
-      'Iva 10 %': `=SUM(F2:F${lastRowIndex})`,
-      'Iva 5%': `=SUM(G2:G${lastRowIndex})`,
-      'Total Iva': `=SUM(H2:H${lastRowIndex})`,
+      'Monto': totalMonto,
+      'Iva 10 %': totalIva10,
+      'Iva 5%': totalIva5,
+      'Total Iva': totalIvaTotal,
       'Timbrado': '',
     });
 
-    const csv = Papa.unparse(dataToExport, {
-      quotes: true, // Forzar comillas para evitar problemas con caracteres especiales, aunque las fórmulas podrían quedar como strings
-      quoteChar: '"',
-      escapeChar: '"',
-      delimiter: ",",
-      header: true,
-      newline: "\r\n",
-      skipEmptyLines: false
-    });
-    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement('a');
-    link.href = URL.createObjectURL(blob);
-    link.setAttribute('download', 'facturas.csv');
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    const worksheet = XLSX.utils.json_to_sheet(dataToExport);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Facturas");
+    XLSX.writeFile(workbook, "facturas.xlsx");
   };
 
   const formatNumber = (value: string | number) => {
@@ -337,12 +329,12 @@ function App() {
             </button>
 
             <button
-              onClick={downloadCSV}
+              onClick={downloadXLSX}
               disabled={invoices.length === 0}
               className="button-grid button-download"
             >
               <DownloadIcon />
-              <span>Descargar CSV</span>
+              <span>Descargar XLSX</span>
             </button>
           </div>
 
