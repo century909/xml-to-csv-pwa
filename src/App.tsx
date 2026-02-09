@@ -146,8 +146,12 @@ function App() {
       // 1. Buscar IDs de correos con facturas XML
       const [year, monthNumber] = month.split('-');
       const startDate = `${year}-${monthNumber}-01`;
-      const endDate = new Date(parseInt(year), parseInt(monthNumber), 0);
-      const formattedEndDate = `${year}-${monthNumber}-${endDate.getDate()}`;
+      
+      // Para incluir el último día del mes, el "before" debe ser el primer día del mes siguiente
+      const nextMonthDate = new Date(parseInt(year), parseInt(monthNumber), 1);
+      const nextMonthYear = nextMonthDate.getFullYear();
+      const nextMonthNum = String(nextMonthDate.getMonth() + 1).padStart(2, '0');
+      const formattedEndDate = `${nextMonthYear}-${nextMonthNum}-01`;
 
       let query = `has:attachment filename:xml after:${startDate} before:${formattedEndDate}`;
       if (company) {
